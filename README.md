@@ -2,7 +2,7 @@
 
 # 🌙 LunarShell
 
-A modern, elegant, and secure shell environment that transforms your Linux terminal experience with smart configurations, enhanced security, and beautiful customizations. Powered by Starship prompt and compatible with Ubuntu, Enterprise Linux, and Arch Linux.
+A modern, elegant, and secure shell environment that transforms your Linux server experience with smart configurations, enhanced security, and beautiful customizations. Designed specifically for server distributions and optimized for system administration tasks.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/ohemilyy/LunarShell)
@@ -14,48 +14,51 @@ A modern, elegant, and secure shell environment that transforms your Linux termi
 
 ## ✨ Features
 
-- 🚀 **Modern Shell Experience**: Enhanced prompt powered by Starship
-- 🎨 **Beautiful MOTD**: Customizable Message of the Day with system information
-- 🛡️ **Security Focused**: Improved SSH and system security configurations
-- 📦 **Smart Package Management**: Distribution-aware package handling
+- 🚀 **Modern Server Shell**: Enhanced prompt powered by Starship
+- 🎨 **Server MOTD**: Informative Message of the Day with system metrics
+- 🛡️ **Security Focused**: Hardened SSH and system security configurations
+- 📦 **Smart Package Management**: Server-optimized package handling
 - 🔧 **Easy Installation**: One-command setup process
-- 🎯 **Distribution Support**: Works on Ubuntu, Enterprise Linux, and Arch Linux
+- 🎯 **Server Distribution Support**: Works on Ubuntu Server, Enterprise Linux, and Arch Linux
 
 ## 🚀 Quick Install
 ```bash
 curl -fsSL https://shell.lunarlabs.cc/install.sh | sudo bash
 ```
 
-## 💻 Supported Distributions
+## 💻 Supported Server Distributions
 
-- **Ubuntu** (20.04 and newer)
+- **Ubuntu Server** (20.04 LTS and newer)
 - **Enterprise Linux** (EL8, EL9)
-- **Arch Linux** (and derivatives)
+- **Arch Linux** (minimal installation)
+
+> **Note**: LunarShell is specifically designed for server environments and may not be suitable for desktop distributions. It includes server-specific security configurations and optimizations.
 
 ## 🛠️ What Gets Installed
 
 ### Core Components
 - Starship Prompt
-- Custom MOTD System
-- Enhanced Shell Configurations
+- Server Status MOTD System
+- Hardened Shell Configurations
 - Security Optimizations
 
-### Utility Packages
+### Server Utilities
 - `figlet`: ASCII art text generator
 - `jq`: JSON processor
 - `zsh`: Z Shell
-- `sysstat`: System performance tools
+- `sysstat`: System performance monitoring
 - `htop`: Interactive process viewer
 - `neofetch`: System information tool
-- And more...
+- And more server administration tools...
 
 ## 🔒 Security Features
 
-- Enhanced SSH configuration
-- Improved firewall rules
+- Hardened SSH configuration
+- Strict firewall rules
 - Secure shell defaults
 - Limited authentication attempts
 - Cloudflare IP allowlisting
+- Server access logging
 
 ## ⚙️ Configuration
 

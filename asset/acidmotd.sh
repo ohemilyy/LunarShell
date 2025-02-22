@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # shellcheck disable=SC1090,SC1091
 
 # Credits to x70b1 for the original script
@@ -541,7 +541,7 @@ print_updates() {
 print_letsencrypt() {
     if [ -d $LETSENCRYPT_CERTPATH ] && [ "$(ls -a $LETSENCRYPT_CERTPATH)" ]; then
         printf "\\n"
-        printf "    \\033[1;37mSSL / let’s encrypt:\\033[0m\\n"
+        printf "    \\033[1;37mSSL / let's encrypt:\\033[0m\\n"
 
         cert_list=$(sudo find $LETSENCRYPT_CERTPATH -name cert.pem)
 

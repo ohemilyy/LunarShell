@@ -1,4 +1,14 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+# Ensure script uses correct line endings and encoding
+if grep -U $'\x0D' "$0" > /dev/null 2>&1; then
+    echo "Error: Script contains Windows-style line endings (CRLF)"
+    echo "Please convert to Unix-style line endings (LF) using:"
+    echo "  dos2unix install.sh"
+    echo "Or:"
+    echo "  sed -i 's/\r$//' install.sh"
+    exit 1
+fi
 
 # Exit on error
 set -e
@@ -45,7 +55,6 @@ log() {
             ;;
     esac
 }
-
 # Display banner
 display_banner() {
     clear
@@ -67,7 +76,6 @@ EOF
     printf "${DIM}└─${NC} ${BOLD}Open Source Contributors${NC}\n"
     printf "\n${DIM}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n\n"
 }
-
 # Check distribution requirements
 check_distroreqs() {
     log section "Detecting System Distribution"
@@ -103,7 +111,7 @@ main() {
     if [ ! "$EUID" -eq 0 ]; then
         log error "This script must be run as root"
         exit 1
-    }
+    fi
 
     display_banner
     

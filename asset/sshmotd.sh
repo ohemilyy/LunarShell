@@ -1,3 +1,5 @@
+#!/bin/bash
+
 if [ -n "$SSH_CLIENT" ] || [ -n "$SSH_TTY" ]; then
   SESSION_TYPE=remote/ssh
 # many other tests omitted

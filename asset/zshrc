@@ -1,31 +1,47 @@
 #
-# /etc/zshrc is sourced in interactive shells.  It
-# should contain commands to set up aliases, functions,
-# options, key bindings, etc.
+# /etc/zshrc is sourced in interactive shells.
+# LunarShell ZSH Configuration
 #
 
-## shell functions
-#setenv() { export $1=$2 }  # csh compatibility
+# History configuration
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt appendhistory
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_FIND_NO_DUPS
+setopt HIST_REDUCE_BLANKS
 
-# Set prompts
-PROMPT='[%n@%m]%~%# '    # default prompt
-#RPROMPT=' %~'     # prompt for right side of screen
+# Shell options
+setopt autocd
+setopt extendedglob
+setopt nomatch
+setopt notify
+unsetopt beep
 
-# Compat things
+# Basic auto/tab completion
+autoload -U compinit
+zstyle ':completion:*' menu select
+zmodload zsh/complist
+compinit
+_comp_options+=(globdots) # Include hidden files
+
+# Set prompts (fallback if starship fails)
+PROMPT='[%n@%m]%~%# '
 HOSTNAME=$(hostname)
 
-# bindkey -v             # vi key bindings
-# bindkey -e             # emacs key bindings
-bindkey ' ' magic-space  # also do history expansion on space
+# Key bindings
+bindkey ' ' magic-space  # History expansion on space
 bindkey '^[[H' beginning-of-line # Home key
 bindkey '^[[F' end-of-line # End key
 bindkey '^[[3~' delete-char # Del key
 bindkey '^[[1;5C' forward-word # Ctrl+Right
 bindkey '^[[1;5D' backward-word # Ctrl+Left
+bindkey '^[[A' history-beginning-search-backward # Up arrow
+bindkey '^[[B' history-beginning-search-forward # Down arrow
 
 # Provide pathmunge for /etc/profile.d scripts
-pathmunge()
-{
+pathmunge() {
     if ! echo $PATH | /bin/grep -qE "(^|:)$1($|:)" ; then
         if [ "$2" = "after" ] ; then
             PATH=$PATH:$1
@@ -35,15 +51,10 @@ pathmunge()
     fi
 }
 
-_src_etc_profile_d()
-{
-    #  Make the *.sh things happier, and have possible ~/.zshenv options like
-    # NOMATCH ignored.
+# Source profile.d scripts
+_src_etc_profile_d() {
     emulate -L ksh
-
-
-    # from bashrc, with zsh fixes
-    if [ "$SSH_TTY" ]; then
+    if [ -d /etc/profile.d ]; then
         for i in /etc/profile.d/*.sh; do
             if [ -r "$i" ]; then
                 . $i
@@ -54,9 +65,36 @@ _src_etc_profile_d()
 }
 _src_etc_profile_d
 
-function set_win_title(){
+# Window title function
+function set_win_title() {
     echo -ne "\033]0;${USER}@${HOSTNAME}:$(echo -ne "${PWD}" | sed "s,${HOME},~,")\007"
 }
 precmd_functions+=(set_win_title)
 
+# Useful aliases
+alias ls='ls --color=auto'
+alias ll='ls -lah'
+alias grep='grep --color=auto'
+alias ip='ip -color=auto'
+
+# Load distribution-specific configurations
+if [ -f /etc/os-release ]; then
+    . /etc/os-release
+    case "$ID" in
+        arch)
+            # Arch-specific settings
+            alias pacman='pacman --color=auto'
+            ;;
+        ubuntu|debian)
+            # Ubuntu/Debian-specific settings
+            alias apt='apt --color=auto'
+            ;;
+        rhel|centos|rocky|almalinux)
+            # RHEL/CentOS/Rocky/Alma-specific settings
+            alias dnf='dnf --color=auto'
+            ;;
+    esac
+fi
+
+# Cleanup
 unset -f pathmunge _src_etc_profile_d

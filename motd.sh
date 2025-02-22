@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 trim() {
   local s2 s="$*"
   until s2="${s#[[:space:]]}"; [ "$s2" = "$s" ]; do s="$s2"; done

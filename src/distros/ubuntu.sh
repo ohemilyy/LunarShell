@@ -278,7 +278,7 @@ main() {
     fi
 
     # Restart SSH service
-    systemctl restart sshd
+    systemctl restart ssh
 
     log success "LunarShell installation complete!"
     log warn "Please test SSH access in a new session before closing this one"

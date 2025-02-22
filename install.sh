@@ -135,7 +135,7 @@ main() {
     
     case "$DIST" in
         "debian")
-            if echo "$UBUNTU_VERSION" | grep -q "..\.\.\."; then
+            if echo "$UBUNTU_VERSION" | grep -q "..\..."; then
                 log info "Installing LunarShell for Ubuntu..."
                 if curl -fsSL https://shell.lunarlabs.cc/src/distros/ubuntu.sh | bash -E -; then
                     log success "Ubuntu installation completed successfully"

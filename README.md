@@ -22,8 +22,7 @@ A modern, elegant, and secure shell environment that transforms your Linux termi
 - 🎯 **Distribution Support**: Works on Ubuntu, Enterprise Linux, and Arch Linux
 
 ## 🚀 Quick Install
-```
-bash
+```bash
 curl -fsSL https://shell.lunarlabs.cc/install.sh | sudo bash
 ```
 
@@ -63,8 +62,7 @@ curl -fsSL https://shell.lunarlabs.cc/install.sh | sudo bash
 ### Custom MOTD
 The Message of the Day can be customized by editing:
 
-``
-bash
+```bash
 /etc/profile.d/sshmotd.sh
 ```
 

@@ -8,7 +8,7 @@ A modern, elegant, and secure shell environment that transforms your Linux serve
 [![Version](https://img.shields.io/badge/version-2.0.0-green.svg)](https://github.com/ohemilyy/LunarShell)
 [![Starship](https://img.shields.io/badge/powered%20by-starship-DD0B78.svg)](https://starship.rs/)
 
-<img src="assets/preview.png" alt="LunarShell Preview" width="800"/>
+<img src="https://i.imgur.com/JGJnFzI.png" alt="LunarShell Preview" width="800"/>
 
 </div>
 
@@ -23,7 +23,7 @@ A modern, elegant, and secure shell environment that transforms your Linux serve
 
 ## 🚀 Quick Install
 ```bash
-curl -fsSL https://shell.lunarlabs.cc/install.sh | sudo bash
+curl -fsSL https://shell.lunarshell.dev/install.sh | sudo bash
 ```
 
 ## 💻 Supported Server Distributions

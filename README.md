@@ -98,6 +98,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🙏 Acknowledgments
 
 - [Starship](https://starship.rs/) for the amazing cross-shell prompt
+- [Dani](https://github.com/daniwasonline) Orginal Creator of DragonShell
 - All our contributors and users
 
 ## 📞 Support

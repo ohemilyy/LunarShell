@@ -12,6 +12,6 @@ fi
 if [ "$SESSION_TYPE" = "remote/ssh" ]; then
   clear
   printf "\n" 
-  curl --silent https://shell.lunarlabs.cc/motd.sh | bash -E -
+  curl --silent https://shell.lunarshell.dev/motd.sh | bash -E -
   printf "\n"
 fi

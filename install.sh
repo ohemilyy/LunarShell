@@ -137,7 +137,7 @@ main() {
         "debian")
             if echo "$UBUNTU_VERSION" | grep -q "..\..."; then
                 log info "Installing LunarShell for Ubuntu..."
-                if curl -fsSL https://shell.lunarlabs.cc/src/distros/ubuntu.sh | bash -E -; then
+                if curl -fsSL https://shell.lunarshell.dev/src/distros/ubuntu.sh | bash -E -; then
                     log success "Ubuntu installation completed successfully"
                 else
                     log error "Ubuntu installation failed"
@@ -151,7 +151,7 @@ main() {
         "el")
             if [[ "$EL_MAJOR_VERSION" -eq 8 ]] || [[ "$EL_MAJOR_VERSION" -eq 9 ]]; then
                 log info "Installing LunarShell for Enterprise Linux ${EL_MAJOR_VERSION}..."
-                if curl -fsSL https://shell.lunarlabs.cc/src/distros/el8.sh | bash -E -; then
+                if curl -fsSL https://shell.lunarshell.dev/src/distros/el8.sh | bash -E -; then
                     log success "Enterprise Linux installation completed successfully"
                 else
                     log error "Enterprise Linux installation failed"
@@ -164,7 +164,7 @@ main() {
             ;;
         "arch")
             log info "Installing LunarShell for Arch Linux..."
-            if curl -fsSL https://shell.lunarlabs.cc/src/distros/arch.sh | bash -E -; then
+            if curl -fsSL https://shell.lunarshell.dev/src/distros/arch.sh | bash -E -; then
                 log success "Arch Linux installation completed successfully"
             else
                 log error "Arch Linux installation failed"

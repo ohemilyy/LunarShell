@@ -191,7 +191,7 @@ main() {
     for file in "${LUNAR_FILES[@]}"; do
         source_file="${file%%:*}"
         dest_file="${file##*:}"
-        show_task "Downloading ${source_file}" "curl --silent https://shell.lunarlabs.cc/asset/$source_file > $dest_file"
+        show_task "Downloading ${source_file}" "curl --silent https://shell.lunarshell.dev/asset/$source_file > $dest_file"
     done
     
     log done "LunarShell files installed"

@@ -189,7 +189,7 @@ main() {
     for file in "${LUNAR_FILES[@]}"; do
         source_file="${file%%:*}"
         dest_file="${file##*:}"
-        if ! curl --silent -f "https://shell.lunarlabs.cc/asset/$source_file" > "$dest_file"; then
+        if ! curl --silent -f "https://shell.lunarshell.dev/asset/$source_file" > "$dest_file"; then
             log error "Failed to download $source_file"
             exit 1
         fi

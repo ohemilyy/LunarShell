@@ -216,12 +216,20 @@ main() {
     [[ -n $current_ip ]] && ufw allow from "$current_ip" to any port 22 comment 'Allow current SSH IP'
 
     # Configure Cloudflare IPs
-    if curl -s https://www.cloudflare.com/ips-v4 -o /tmp/cf_ips && \
-       curl -s https://www.cloudflare.com/ips-v6 >> /tmp/cf_ips; then
+    if curl -s https://www.cloudflare.com/ips-v4 -o /tmp/cf_ips_v4 && \
+       curl -s https://www.cloudflare.com/ips-v6 -o /tmp/cf_ips_v6; then
+        # Process IPv4 addresses
         while IFS= read -r cfip; do
-            [[ -n $cfip ]] && ufw allow from "$cfip" comment 'Cloudflare IP'
-        done < /tmp/cf_ips
-        rm /tmp/cf_ips
+            [[ -n $cfip ]] && ufw allow from "$cfip" comment 'Cloudflare IPv4'
+        done < /tmp/cf_ips_v4
+        
+        # Process IPv6 addresses
+        while IFS= read -r cfip; do
+            [[ -n $cfip ]] && ufw allow from "$cfip" comment 'Cloudflare IPv6'
+        done < /tmp/cf_ips_v6
+        
+        # Clean up temporary files
+        rm -f /tmp/cf_ips_v4 /tmp/cf_ips_v6
     fi
 
     # Allow Pterodactyl ports

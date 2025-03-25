@@ -23,7 +23,7 @@ A modern, elegant, and secure shell environment that transforms your Linux serve
 
 ## 🚀 Quick Install
 ```bash
-curl -fsSL https://shell.lunarshell.dev/install.sh | sudo bash
+bash <(curl -sL https://shell.lunarshell.dev/install.sh)
 ```
 
 ## 💻 Supported Server Distributions

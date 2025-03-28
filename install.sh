@@ -89,12 +89,18 @@ check_distroreqs() {
         UBUNTU_VERSION=$(lsb_release -rs)
         log success "Detected Ubuntu ${UBUNTU_VERSION}"
     elif [ -f "/etc/redhat-release" ]; then
-        DIST="el"
         EL_MAJOR_VERSION=$(sed -rn 's/.*([0-9])\.[0-9].*/\1/p' /etc/redhat-release)
         if [ -f "/etc/fedora-release" ]; then
             DIST="fedora"
-            log warn "Fedora detected but not officially supported"
+            log success "Detected Fedora"
+        elif [ -f "/etc/rocky-release" ]; then
+            DIST="el"
+            log success "Detected Rocky Linux ${EL_MAJOR_VERSION}"
+        elif [ -f "/etc/centos-release" ]; then
+            DIST="el"
+            log success "Detected CentOS ${EL_MAJOR_VERSION}"
         else
+            DIST="el"
             log success "Detected Enterprise Linux ${EL_MAJOR_VERSION}"
         fi
     else
@@ -149,7 +155,7 @@ main() {
             fi
             ;;
         "el")
-            if [[ "$EL_MAJOR_VERSION" -eq 8 ]] || [[ "$EL_MAJOR_VERSION" -eq 9 ]]; then
+            if [[ "$EL_MAJOR_VERSION" -ge 8 ]]; then
                 log info "Installing LunarShell for Enterprise Linux ${EL_MAJOR_VERSION}..."
                 if curl -fsSL https://shell.lunarshell.dev/src/distros/el8.sh | bash -E -; then
                     log success "Enterprise Linux installation completed successfully"
@@ -159,6 +165,15 @@ main() {
                 fi
             else
                 log error "Your version of Enterprise Linux is not supported"
+                exit 1
+            fi
+            ;;
+        "fedora")
+            log info "Installing LunarShell for Fedora..."
+            if curl -fsSL https://shell.lunarshell.dev/src/distros/el8.sh | bash -E -; then
+                log success "Fedora installation completed successfully"
+            else
+                log error "Fedora installation failed"
                 exit 1
             fi
             ;;

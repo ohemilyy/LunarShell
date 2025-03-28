@@ -1,153 +1,28 @@
 #!/bin/bash
 
-# Exit on error
 set -e
 
-# Color and style definitions
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
-CYAN='\033[0;36m'
-BOLD='\033[1m'
-DIM='\033[2m'
-ITALIC='\033[3m'
-NC='\033[0m'
+# Import common functions and variables from ubuntu.sh
+source "$(dirname "$0")/ubuntu.sh"
 
-# Spinner frames
-SPINNER_FRAMES=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
-
-# Progress bar function
-progress_bar() {
-    local duration=$1
-    local width=50
-    local progress=0
-    local step=$((width * 100 / duration / 100))
-
-    printf "${CYAN}[${NC}"
-    for ((i = 0; i < width; i++)); do
-        printf "${DIM}▱${NC}"
-    done
-    printf "${CYAN}]${NC} ${DIM}0%%${NC}"
-
-    for ((i = 0; i <= duration; i++)); do
-        sleep 0.1
-        progress=$((i * 100 / duration))
-        pos=$((i * width / duration))
-        printf "\r${CYAN}[${NC}"
-        for ((j = 0; j < width; j++)); do
-            if [ $j -lt $pos ]; then
-                printf "${GREEN}▰${NC}"
-            else
-                printf "${DIM}▱${NC}"
-            fi
-        done
-        printf "${CYAN}]${NC} ${BOLD}%d%%${NC}" $progress
-    done
-    printf "\n"
-}
-
-# Spinner function
-spinner() {
-    local pid=$1
-    local message=$2
-    local i=0
-    
-    while kill -0 $pid 2>/dev/null; do
-        printf "\r${BLUE}${SPINNER_FRAMES[i]}${NC} ${message}"
-        i=$(((i + 1) % ${#SPINNER_FRAMES[@]}))
-        sleep 0.1
-    done
-    printf "\r${GREEN}✓${NC} ${message}\n"
-}
-
-# Enhanced logging function
-log() {
-    local level=$1
-    local msg=$2
-    local timestamp=$(date '+%H:%M:%S')
-    
-    case $level in
-        info)
-            printf "${DIM}${timestamp}${NC} ${BLUE}ℹ${NC} ${msg}\n"
-            ;;
-        success)
-            printf "${DIM}${timestamp}${NC} ${GREEN}✓${NC} ${BOLD}${msg}${NC}\n"
-            ;;
-        warn)
-            printf "${DIM}${timestamp}${NC} ${YELLOW}⚠${NC} ${ITALIC}${msg}${NC}\n"
-            ;;
-        error)
-            printf "${DIM}${timestamp}${NC} ${RED}✗${NC} ${BOLD}${msg}${NC}\n"
-            ;;
-        section)
-            printf "\n${MAGENTA}┌──${NC} ${BOLD}${msg}${NC}\n"
-            ;;
-        subsection)
-            printf "${CYAN}├─${NC} ${msg}\n"
-            ;;
-        done)
-            printf "${MAGENTA}└──${NC} ${GREEN}${BOLD}${msg}${NC}\n\n"
-            ;;
-    esac
-}
-
-# Function to show task completion
-show_task() {
-    local msg=$1
-    local cmd=$2
-    
-    log subsection "$msg"
-    ($cmd) &
-    spinner $! "  ${DIM}$msg${NC}"
-}
-
-# ASCII art banner
-display_banner() {
-    clear
-    cat << "EOF"
-    
-██╗     ██╗   ██╗███╗   ██╗ █████╗ ██████╗ ███████╗██╗  ██╗███████╗██╗     ██╗     
-██║     ██║   ██║████╗  ██║██╔══██╗██╔══██╗██╔════╝██║  ██║██╔════╝██║     ██║     
-██║     ██║   ██║██╔██╗ ██║███████║██████╔╝███████╗███████║█████╗  ██║     ██║     
-██║     ██║   ██║██║╚██╗██║██╔══██║██╔══██╗╚════██║██╔══██║██╔══╝  ██║     ██║     
-███████╗╚██████╔╝██║ ╚████║██║  ██║██║  ██║███████║██║  ██║███████╗███████╗███████╗
-╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
-EOF
-    printf "\n${DIM}Version 2.0.0 - Enterprise Linux Installation${NC}\n"
-    printf "${CYAN}Developed by${NC} ${BOLD}Luna${NC}\n"
-    printf "\n${MAGENTA}Contributors:${NC}\n"
-    printf "${DIM}├─${NC} ${BOLD}Luna${NC} ${DIM}(Lead Developer)${NC}\n"
-    printf "${DIM}├─${NC} ${BOLD}Bahar Kurt${NC} ${DIM}(@kurtbahartr)${NC}\n"
-    printf "${DIM}├─${NC} ${BOLD}Community Members${NC}\n"
-    printf "${DIM}└─${NC} ${BOLD}Open Source Contributors${NC}\n"
-    printf "\n${DIM}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n\n"
-}
-
-# Main installation function
-main() {
-    display_banner
-    
-    # Check root
-    if [ "$EUID" -ne 0 ]; then
-        log error "Please run as root or with sudo"
-        exit 1
-    }
-
-    log section "Starting LunarShell Installation"
-    
-    # System update
-    log section "System Update"
-    show_task "Updating system packages" "dnf update -y"
-    log done "System updated successfully"
-
-    # Package installation
+install_packages() {
     log section "Installing Required Packages"
     
+    if command -v dnf &> /dev/null; then
+        PKG_MANAGER="dnf"
+    else
+        PKG_MANAGER="yum"
+    fi
+
+    if ! rpm -qa | grep -q epel-release; then
+        log info "Installing EPEL repository..."
+        $PKG_MANAGER install -y epel-release
+    fi
+
     PACKAGES=(
         "figlet" "jq" "zsh" "sysstat" "curl" "wget"
         "htop" "neofetch" "net-tools" "tree" "unzip"
+        "firewalld" 
     )
 
     total_packages=${#PACKAGES[@]}
@@ -157,7 +32,7 @@ main() {
         current=$((current + 1))
         if ! command -v "$package" &> /dev/null; then
             printf "${CYAN}[${current}/${total_packages}]${NC} Installing ${BOLD}${package}${NC}\n"
-            dnf install -y "$package" &> /dev/null
+            $PKG_MANAGER install -y "$package" &> /dev/null
             progress_bar 10
         else
             printf "${CYAN}[${current}/${total_packages}]${NC} ${GREEN}✓${NC} ${package} ${DIM}already installed${NC}\n"
@@ -165,10 +40,94 @@ main() {
     done
     
     log done "Package installation complete"
+}
 
-    # Install Starship
+# Override firewall configuration for RHEL-based systems
+configure_firewall() {
+    log info "Applying Lunar Firewall configurations..."
+    current_ip=$(echo "$SSH_CLIENT" | cut -d' ' -f 1)
+
+    if command -v ufw &> /dev/null; then
+        ufw disable
+        systemctl disable ufw
+    fi
+
+    systemctl enable --now firewalld
+    firewall-cmd --permanent --zone=public --set-target=DROP
+    
+    [[ -n $current_ip ]] && firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='$current_ip' service name='ssh' accept"
+
+    if curl -s https://www.cloudflare.com/ips-v4 -o /tmp/cf_ips_v4 && \
+       curl -s https://www.cloudflare.com/ips-v6 -o /tmp/cf_ips_v6; then
+
+        while IFS= read -r cfip; do
+            [[ -n $cfip ]] && firewall-cmd --permanent --zone=public --add-source="$cfip"
+        done < /tmp/cf_ips_v4
+        
+        while IFS= read -r cfip; do
+            [[ -n $cfip ]] && firewall-cmd --permanent --zone=public --add-source="$cfip"
+        done < /tmp/cf_ips_v6
+        
+        rm -f /tmp/cf_ips_v4 /tmp/cf_ips_v6
+    fi
+
+    log info "Do you have Pterodactyl installed and want to configure firewall rules for it? (y/N)"
+    read -r response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        log info "Configuring Pterodactyl firewall rules..."
+        for port in {40001..40010} {25566..25580} 6379 27017 3306; do
+            firewall-cmd --permanent --zone=public --add-rich-rule="rule family='ipv4' source address='172.18.0.1' port port='$port' protocol='tcp' accept"
+        done
+        log success "Pterodactyl firewall rules configured"
+    fi
+
+    # Reload firewall
+    firewall-cmd --reload
+    log success "Lunar Firewall configurations applied"
+}
+
+# Override system update for RHEL-based systems
+system_update() {
+    log section "System Update"
+    if command -v dnf &> /dev/null; then
+        show_task "Updating system packages" "dnf update -y"
+    else
+        show_task "Updating system packages" "yum update -y"
+    fi
+    log done "System updated successfully"
+}
+
+# Main installation function for RHEL-based systems
+main() {
+    display_banner
+    
+    # Check root
+    if [ "$EUID" -ne 0 ]; then
+        log error "Please run as root or with sudo"
+        exit 1
+    }
+
+    # Detect distribution
+    if [ -f /etc/fedora-release ]; then
+        DISTRO="Fedora"
+    elif [ -f /etc/rocky-release ]; then
+        DISTRO="Rocky Linux"
+    elif [ -f /etc/centos-release ]; then
+        DISTRO="CentOS"
+    else
+        log error "Unsupported distribution"
+        exit 1
+    fi
+
+    log section "Starting LunarShell Installation on $DISTRO"
+    
+    # Run system-specific functions
+    system_update
+    install_packages
+
+    # Continue with common installation steps
     if ! command -v starship &> /dev/null; then
-        log info "Installing Starship prompt..."
+        log info "Installing starship..."
         curl -sS https://starship.rs/install.sh | sh -s -- -y
         log success "Starship installed"
     else
@@ -176,34 +135,42 @@ main() {
     fi
 
     # Download and install LunarShell files
-    log section "Installing LunarShell Files"
-    
+    log info "Downloading files for LunarShell..."
     LUNAR_FILES=(
         "starship.toml:/etc/starship.toml"
         "sshmotd.sh:/etc/profile.d/sshmotd.sh"
         "bashrc_el8:/etc/bashrc"
         "zshrc:/etc/zshrc"
+        "banner:/etc/banner"
     )
 
     for file in "${LUNAR_FILES[@]}"; do
         source_file="${file%%:*}"
         dest_file="${file##*:}"
-        show_task "Downloading ${source_file}" "curl --silent https://shell.lunarshell.dev/asset/$source_file > $dest_file"
+        if ! curl --silent -f "https://shell.lunarshell.dev/asset/$source_file" > "$dest_file"; then
+            log error "Failed to download $source_file"
+            exit 1
+        fi
     done
-    
-    log done "LunarShell files installed"
+    log success "Luna files downloaded and installed"
 
-    # Configure Starship
-    log section "Configuring Starship"
-    show_task "Setting up environment variables" "echo 'export STARSHIP_CONFIG=/etc/starship.toml' > /etc/profile.d/lunar-env.sh"
-    show_task "Configuring Bash integration" "echo 'eval \"\$(starship init bash)\"' >> /etc/bashrc"
-    show_task "Configuring Zsh integration" "echo 'eval \"\$(starship init zsh)\"' >> /etc/zshrc"
-    log done "Starship configured successfully"
+    log info "Applying Starship configurations..."
+    echo "export STARSHIP_CONFIG=/etc/starship.toml" > /etc/profile.d/lunar-env.sh
+    echo 'eval "$(starship init bash)"' >> /etc/bashrc
+    echo 'eval "$(starship init zsh)"' >> /etc/zshrc
+    log success "Starship configurations applied"
 
-    # Set permissions
-    log section "Setting File Permissions"
-    show_task "Setting executable permissions" "chmod +x /etc/profile.d/{sshmotd.sh,lunar-env.sh} /etc/{bashrc,zshrc}"
-    log done "Permissions set successfully"
+    configure_firewall
+
+    log info "Setting file permissions..."
+    chmod +x /etc/profile.d/{sshmotd.sh,lunar-env.sh} /etc/{banner,bashrc,zshrc,starship.toml}
+
+    # Configure SSH (using the same configuration as Ubuntu)
+    configure_ssh
+
+    log success "LunarShell installation complete!"
+    log warn "Please test SSH access in a new session before closing this one"
+    log warn "If using a cloud provider, ensure your firewall rules allow SSH access"
 
     # Optional: Set ZSH as default shell
     if command -v zsh &> /dev/null; then
@@ -214,10 +181,9 @@ main() {
             log success "ZSH set as default shell"
         fi
     fi
-
-    log success "LunarShell installation complete!"
-    log warn "Please restart your shell or log out and back in to apply changes"
 }
 
-# Run the main installation
-main "$@"
+# Run the main installation if this script is being executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

@@ -35,6 +35,8 @@ bindkey ' ' magic-space  # History expansion on space
 bindkey '^[[H' beginning-of-line # Home key
 bindkey '^[[F' end-of-line # End key
 bindkey '^[[3~' delete-char # Del key
+bindkey '^[[1;3C' forward-word # Alt+Right
+bindkey '^[[1;3D' backward-word # Alt+Left
 bindkey '^[[1;5C' forward-word # Ctrl+Right
 bindkey '^[[1;5D' backward-word # Ctrl+Left
 bindkey '^[[A' history-beginning-search-backward # Up arrow

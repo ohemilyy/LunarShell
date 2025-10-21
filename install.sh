@@ -135,6 +135,8 @@ main() {
     fi
 
     log section "Starting Installation Process"
+
+    TEMP_DIR="$(mktemp -d)"
     
     # Check distribution and install appropriate version
     check_distroreqs
@@ -143,7 +145,7 @@ main() {
         "debian")
             if echo "$UBUNTU_VERSION" | grep -q "..\..."; then
                 log info "Installing LunarShell for Ubuntu..."
-                if curl -fsSL https://shell.lunarshell.dev/src/distros/ubuntu.sh | bash -E -; then
+                if (curl -fsSL https://shell.lunarshell.dev/src/distros/ubuntu.sh > "$TEMP_DIR"/ubuntu.sh && bash "$TEMP_DIR"/ubuntu.sh); then
                     log success "Ubuntu installation completed successfully"
                 else
                     log error "Ubuntu installation failed"
@@ -157,7 +159,7 @@ main() {
         "el")
             if [[ "$EL_MAJOR_VERSION" -ge 8 ]]; then
                 log info "Installing LunarShell for Enterprise Linux ${EL_MAJOR_VERSION}..."
-                if curl -fsSL https://shell.lunarshell.dev/src/distros/el8.sh | bash -E -; then
+                if (curl -fsSL https://shell.lunarshell.dev/src/distros/el8.sh > "$TEMP_DIR"/el8.sh && bash "$TEMP_DIR"/el8.sh); then
                     log success "Enterprise Linux installation completed successfully"
                 else
                     log error "Enterprise Linux installation failed"
@@ -170,7 +172,7 @@ main() {
             ;;
         "fedora")
             log info "Installing LunarShell for Fedora..."
-            if curl -fsSL https://shell.lunarshell.dev/src/distros/el8.sh | bash -E -; then
+            if (curl -fsSL https://shell.lunarshell.dev/src/distros/el8.sh > "$TEMP_DIR"/el8.sh && bash "$TEMP_DIR"/el8.sh); then
                 log success "Fedora installation completed successfully"
             else
                 log error "Fedora installation failed"
@@ -179,7 +181,7 @@ main() {
             ;;
         "arch")
             log info "Installing LunarShell for Arch Linux..."
-            if curl -fsSL https://shell.lunarshell.dev/src/distros/arch.sh | bash -E -; then
+            if (curl -fsSL https://shell.lunarshell.dev/src/distros/arch.sh > "$TEMP_DIR"/arch.sh && bash "$TEMP_DIR"/arch.sh); then
                 log success "Arch Linux installation completed successfully"
             else
                 log error "Arch Linux installation failed"
@@ -193,6 +195,8 @@ main() {
     esac
 
     log section "Installation Complete"
+    log info "Cleaning up"
+    rm -rf "$TEMP_DIR"
     log success "LunarShell has been successfully installed!"
     log warn "Please log out and back in to start using LunarShell"
     log info "Thank you for installing LunarShell!"

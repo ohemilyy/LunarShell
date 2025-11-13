@@ -2,8 +2,127 @@
 
 set -e
 
-# Import common functions and variables from ubuntu.sh
-source "$(dirname "$0")/ubuntu.sh"
+# Color and style definitions
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+DIM='\033[2m'
+ITALIC='\033[3m'
+NC='\033[0m'
+
+# Spinner frames
+SPINNER_FRAMES=('⠋' '⠙' '⠹' '⠸' '⠼' '⠴' '⠦' '⠧' '⠇' '⠏')
+
+# Progress bar function
+progress_bar() {
+    local duration=$1
+    local width=50
+    local progress=0
+    local step=$((width * 100 / duration / 100))
+
+    printf "${CYAN}[${NC}"
+    for ((i = 0; i < width; i++)); do
+        printf "${DIM}▱${NC}"
+    done
+    printf "${CYAN}]${NC} ${DIM}0%%${NC}"
+
+    for ((i = 0; i <= duration; i++)); do
+        sleep 0.1
+        progress=$((i * 100 / duration))
+        pos=$((i * width / duration))
+        printf "\r${CYAN}[${NC}"
+        for ((j = 0; j < width; j++)); do
+            if [ $j -lt $pos ]; then
+                printf "${GREEN}▰${NC}"
+            else
+                printf "${DIM}▱${NC}"
+            fi
+        done
+        printf "${CYAN}]${NC} ${BOLD}%d%%${NC}" $progress
+    done
+    printf "\n"
+}
+
+# Spinner function
+spinner() {
+    local pid=$1
+    local message=$2
+    local i=0
+    
+    while kill -0 $pid 2>/dev/null; do
+        printf "\r${BLUE}${SPINNER_FRAMES[i]}${NC} ${message}"
+        i=$(((i + 1) % ${#SPINNER_FRAMES[@]}))
+        sleep 0.1
+    done
+    printf "\r${GREEN}✓${NC} ${message}\n"
+}
+
+# Enhanced logging function
+log() {
+    local level=$1
+    local msg=$2
+    local timestamp=$(date '+%H:%M:%S')
+    
+    case $level in
+        info)
+            printf "${DIM}${timestamp}${NC} ${BLUE}ℹ${NC} ${msg}\n"
+            ;;
+        success)
+            printf "${DIM}${timestamp}${NC} ${GREEN}✓${NC} ${BOLD}${msg}${NC}\n"
+            ;;
+        warn)
+            printf "${DIM}${timestamp}${NC} ${YELLOW}⚠${NC} ${ITALIC}${msg}${NC}\n"
+            ;;
+        error)
+            printf "${DIM}${timestamp}${NC} ${RED}✗${NC} ${BOLD}${msg}${NC}\n"
+            ;;
+        section)
+            printf "\n${MAGENTA}┌──${NC} ${BOLD}${msg}${NC}\n"
+            ;;
+        subsection)
+            printf "${CYAN}├─${NC} ${msg}\n"
+            ;;
+        finish)
+            printf "${MAGENTA}└──${NC} ${GREEN}${BOLD}${msg}${NC}\n\n"
+            ;;
+    esac
+}
+
+# Function to show task completion
+show_task() {
+    local msg=$1
+    local cmd=$2
+    
+    log subsection "$msg"
+    ($cmd) &
+    spinner $! "  ${DIM}$msg${NC}"
+}
+
+# ASCII art banner
+display_banner() {
+    clear
+    cat << "EOF"
+    
+██╗     ██╗   ██╗███╗   ██╗ █████╗ ██████╗ ███████╗██╗  ██╗███████╗██╗     ██╗     
+██║     ██║   ██║████╗  ██║██╔══██╗██╔══██╗██╔════╝██║  ██║██╔════╝██║     ██║     
+██║     ██║   ██║██╔██╗ ██║███████║██████╔╝███████╗███████║█████╗  ██║     ██║     
+██║     ██║   ██║██║╚██╗██║██╔══██║██╔══██╗╚════██║██╔══██║██╔══╝  ██║     ██║     
+███████╗╚██████╔╝██║ ╚████║██║  ██║██║  ██║███████║██║  ██║███████╗███████╗███████╗
+╚══════╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝╚══════╝╚══════╝
+EOF
+    printf "\n${DIM}Version 2.0.0 - Advanced Installation${NC}\n"
+    printf "${CYAN}Developed by${NC} ${BOLD}Luna${NC}\n"
+    printf "\n${MAGENTA}Contributors:${NC}\n"
+    printf "${DIM}├─${NC} ${BOLD}Luna${NC} ${DIM}(Lead Developer)${NC}\n"
+    printf "${DIM}├─${NC} ${BOLD}Bahar Kurt${NC} ${DIM}(@kurtbahartr)${NC}\n"
+    printf "${DIM}├─${NC} ${BOLD}Community Members${NC}\n"
+    printf "${DIM}└─${NC} ${BOLD}Open Source Contributors${NC}\n"
+    printf "\n${DIM}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}\n\n"
+}
 
 install_packages() {
     log section "Installing Required Packages"
@@ -20,9 +139,9 @@ install_packages() {
     fi
 
     PACKAGES=(
-        "figlet" "jq" "zsh" "sysstat" "curl" "wget"
-        "htop" "neofetch" "net-tools" "tree" "unzip"
-        "firewalld" 
+        "toilet" "jq" "zsh" "sysstat" "curl" "wget"
+        "htop" "fastfetch" "net-tools" "tree" "unzip"
+        "firewalld"
     )
 
     total_packages=${#PACKAGES[@]}
@@ -39,7 +158,7 @@ install_packages() {
         fi
     done
     
-    log done "Package installation complete"
+    log finish "Package installation complete"
 }
 
 # Override firewall configuration for RHEL-based systems
@@ -97,6 +216,51 @@ system_update() {
     log done "System updated successfully"
 }
 
+configure_ssh() {
+    log info "Configuring SSH..."
+    mkdir -p ~/.ssh
+    chmod 700 ~/.ssh
+
+    # Backup and configure sshd_config
+    SSHD_CONFIG="/etc/ssh/sshd_config"
+    cp "$SSHD_CONFIG" "${SSHD_CONFIG}.bak"
+
+    # Configure SSH security settings
+    declare -A ssh_settings=(
+        ["LogLevel"]="VERBOSE"
+        ["MaxAuthTries"]="2"
+        ["MaxSessions"]="2"
+        ["AllowAgentForwarding"]="no"
+        ["AllowTcpForwarding"]="no"
+        ["TCPKeepAlive"]="no"
+        ["Compression"]="no"
+        ["ClientAliveCountMax"]="2"
+        ["PasswordAuthentication"]="no"
+        ["PermitRootLogin"]="no"
+        ["X11Forwarding"]="no"
+    )
+
+    for key in "${!ssh_settings[@]}"; do
+        sed -i "s/^#*${key}.*/${key} ${ssh_settings[$key]}/" "$SSHD_CONFIG"
+    done
+
+    # Add SSH key
+    log info "Please enter your SSH public key:"
+    read -r ssh_key
+
+    if [[ -n "$ssh_key" ]]; then
+        echo "$ssh_key" >> ~/.ssh/authorized_keys
+        chmod 600 ~/.ssh/authorized_keys
+        log success "SSH key added"
+    else
+        log error "No SSH key provided"
+        exit 1
+    fi
+
+    # Restart SSH service
+    systemctl restart sshd 2>/dev/null || systemctl restart ssh
+}
+
 # Main installation function for RHEL-based systems
 main() {
     display_banner
@@ -105,7 +269,7 @@ main() {
     if [ "$EUID" -ne 0 ]; then
         log error "Please run as root or with sudo"
         exit 1
-    }
+    fi
 
     # Detect distribution
     if [ -f /etc/fedora-release ]; then

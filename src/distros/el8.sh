@@ -139,9 +139,9 @@ install_packages() {
     fi
 
     PACKAGES=(
-        "figlet" "jq" "zsh" "sysstat" "curl" "wget"
+        "toilet" "jq" "zsh" "sysstat" "curl" "wget"
         "htop" "neofetch" "net-tools" "tree" "unzip"
-        "firewalld" 
+        "firewalld"
     )
 
     total_packages=${#PACKAGES[@]}
@@ -158,7 +158,7 @@ install_packages() {
         fi
     done
     
-    log done "Package installation complete"
+    log finish "Package installation complete"
 }
 
 # Override firewall configuration for RHEL-based systems

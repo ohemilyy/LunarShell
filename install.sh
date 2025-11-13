@@ -89,7 +89,7 @@ check_distroreqs() {
         UBUNTU_VERSION=$(lsb_release -rs)
         log success "Detected Ubuntu ${UBUNTU_VERSION}"
     elif [ -f "/etc/redhat-release" ]; then
-        EL_MAJOR_VERSION=$(sed -rn 's/.*([0-9])\.[0-9].*/\1/p' /etc/redhat-release)
+        EL_MAJOR_VERSION=$(grep -oE '[0-9]+([.][0-9]+)?' /etc/redhat-release | head -n1 | cut -d. -f1)
         if [ -f "/etc/fedora-release" ]; then
             DIST="fedora"
             log success "Detected Fedora"

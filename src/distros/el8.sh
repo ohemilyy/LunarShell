@@ -2,7 +2,6 @@
 
 set -e
 
-
 # Color and style definitions
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -87,7 +86,7 @@ log() {
         subsection)
             printf "${CYAN}├─${NC} ${msg}\n"
             ;;
-        done)
+        finish)
             printf "${MAGENTA}└──${NC} ${GREEN}${BOLD}${msg}${NC}\n\n"
             ;;
     esac
@@ -215,6 +214,51 @@ system_update() {
         show_task "Updating system packages" "yum update -y"
     fi
     log done "System updated successfully"
+}
+
+configure_ssh() {
+    log info "Configuring SSH..."
+    mkdir -p ~/.ssh
+    chmod 700 ~/.ssh
+
+    # Backup and configure sshd_config
+    SSHD_CONFIG="/etc/ssh/sshd_config"
+    cp "$SSHD_CONFIG" "${SSHD_CONFIG}.bak"
+
+    # Configure SSH security settings
+    declare -A ssh_settings=(
+        ["LogLevel"]="VERBOSE"
+        ["MaxAuthTries"]="2"
+        ["MaxSessions"]="2"
+        ["AllowAgentForwarding"]="no"
+        ["AllowTcpForwarding"]="no"
+        ["TCPKeepAlive"]="no"
+        ["Compression"]="no"
+        ["ClientAliveCountMax"]="2"
+        ["PasswordAuthentication"]="no"
+        ["PermitRootLogin"]="no"
+        ["X11Forwarding"]="no"
+    )
+
+    for key in "${!ssh_settings[@]}"; do
+        sed -i "s/^#*${key}.*/${key} ${ssh_settings[$key]}/" "$SSHD_CONFIG"
+    done
+
+    # Add SSH key
+    log info "Please enter your SSH public key:"
+    read -r ssh_key
+
+    if [[ -n "$ssh_key" ]]; then
+        echo "$ssh_key" >> ~/.ssh/authorized_keys
+        chmod 600 ~/.ssh/authorized_keys
+        log success "SSH key added"
+    else
+        log error "No SSH key provided"
+        exit 1
+    fi
+
+    # Restart SSH service
+    systemctl restart sshd 2>/dev/null || systemctl restart ssh
 }
 
 # Main installation function for RHEL-based systems

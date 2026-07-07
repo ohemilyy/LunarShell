@@ -3,6 +3,7 @@
 set -e
 
 # Import common functions and variables from ubuntu.sh
+curl -fsSL https://shell.lunarshell.dev/src/distros/ubuntu.sh > "$(dirname "$0")/ubuntu.sh"
 source "$(dirname "$0")/ubuntu.sh"
 
 install_packages() {

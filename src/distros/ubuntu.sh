@@ -99,7 +99,7 @@ show_task() {
     local cmd=$2
     
     log subsection "$msg"
-    ($cmd) &
+    ($cmd &>/dev/null) &
     spinner $! "  ${DIM}$msg${NC}"
 }
 

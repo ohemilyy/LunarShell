@@ -303,5 +303,7 @@ main() {
     fi
 }
 
-# Run the main installation
-main "$@"
+# Run the main installation if this script is being executed directly
+if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+    main "$@"
+fi

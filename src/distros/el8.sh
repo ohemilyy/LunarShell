@@ -15,9 +15,11 @@ install_packages() {
         PKG_MANAGER="yum"
     fi
 
-    if ! rpm -qa | grep -q epel-release; then
-        log info "Installing EPEL repository..."
-        $PKG_MANAGER install -y epel-release
+    if [ "$DISTRO" != "Fedora" ]; then
+        if ! rpm -qa | grep -q epel-release; then
+            log info "Installing EPEL repository..."
+            $PKG_MANAGER install -y epel-release
+        fi
     fi
 
     PACKAGES=(

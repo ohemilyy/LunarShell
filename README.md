@@ -49,7 +49,7 @@ bash install.sh
 - `zsh`: Z Shell
 - `sysstat`: System performance monitoring
 - `htop`: Interactive process viewer
-- `neofetch`: System information tool
+- `fastfetch`: System information tool
 - And more server administration tools...
 
 ## 🔒 Security Features

@@ -148,7 +148,7 @@ main() {
     
     PACKAGES=(
         "figlet" "jq" "zsh" "sysstat" "curl" "wget"
-        "htop" "neofetch" "net-tools" "tree" "unzip"
+        "htop" "fastfetch" "net-tools" "tree" "unzip"
     )
 
     total_packages=${#PACKAGES[@]}

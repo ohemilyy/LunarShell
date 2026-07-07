@@ -106,7 +106,7 @@ main() {
     if [ "$EUID" -ne 0 ]; then
         log error "Please run as root or with sudo"
         exit 1
-    }
+    fi
 
     # Detect distribution
     if [ -f /etc/fedora-release ]; then

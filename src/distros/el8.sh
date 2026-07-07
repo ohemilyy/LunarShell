@@ -227,7 +227,8 @@ main() {
         log info "Would you like to set ZSH as your default shell? (y/N)"
         read -r response
         if [[ "$response" =~ ^[Yy]$ ]]; then
-            chsh -s "$(which zsh)"
+            # /usr/sbin/zsh isn't in /etc/shells.
+            chsh -s "/usr/bin/zsh" $SUDO_USER
             log success "ZSH set as default shell"
         fi
     fi
